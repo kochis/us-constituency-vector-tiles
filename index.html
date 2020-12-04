@@ -6,20 +6,178 @@
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
     <script src="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
     <style>
       body { margin: 0; padding: 0; }
       #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+      #legend {
+        position: absolute;
+        bottom: 75px;
+        right: 75px;
+        background: white;
+        border-radius: 5px;
+        border: 1px solid black;
+        padding: 8px 12px;
+      }
+
+      .layer {
+        margin: 12px 5px;
+      }
+
+      .color {
+        width: 20px;
+        height: 20px;
+        background: gray;
+        display: inline-block;
+        margin-right: 5px;
+        vertical-align: middle;
+      }
+
+      .state-house .color {
+        background: #00bbff;
+      }
+      .state-senate .color {
+        background: #ff004c;
+      }
+      .us-house .color {
+        background: #ff9500;
+      }
+      .us-senate .color {
+        background: #70d644;
+      }
+
+      .disabled {
+        opacity: 0.3;
+      }
+
+      .layer:hover {
+        cursor: pointer;
+        opacity: 0.8;
+      }
+
+      #debug {
+        position: absolute;
+        left: 20px;
+        bottom: 20px;
+        font-size: 10px
+      }
     </style>
   </head>
   <body>
     <div id="map"></div>
+
+    <div id="legend">
+      <div class="layer state-house" data-layer="state-house">
+        <span class="color"></span>state house
+      </div>
+      <div class="layer state-senate disabled" data-layer="state-senate">
+        <span class="color"></span>state senate
+      </div>
+      <div class="layer us-house disabled" data-layer="us-house">
+        <span class="color"></span>us house
+      </div>
+      <div class="layer us-senate disabled" data-layer="us-senate">
+        <span class="color"></span>us senate
+      </div>
+    </div>
+
+    <div id="debug">
+    </div>
+
     <script>
+      var layerStyles = {
+        'state-house': {
+          "id": "state-house-fill",
+          "source": "custom",
+          "source-layer": "state-house",
+          "type": "fill",
+          "paint": {
+            "fill-color": "#00bbff",
+            "fill-opacity": 0.4
+          }
+        },
+        'state-senate': {
+          "id": "state-senate-fill",
+          "source": "custom",
+          "source-layer": "state-senate",
+          "type": "fill",
+          "paint": {
+            "fill-color": "#ff004c",
+            "fill-opacity": 0.4
+          }
+        },
+        'us-house': {
+          "id": "us-house-fill",
+          "source": "custom",
+          "source-layer": "us-house",
+          "type": "fill",
+          "paint": {
+            "fill-color": "#ff9500",
+            "fill-opacity": 0.4
+          }
+        },
+        'us-senate': {
+          "id": "us-senate-fill",
+          "source": "custom",
+          "source-layer": "us-senate",
+          "type": "fill",
+          "paint": {
+            "fill-color": "#70d644",
+            "fill-opacity": 0.4
+          }
+        }
+      };
+
+      var style = {
+        "version": 8,
+        "name": "Custom Vector Tiles",
+        "metadata": {
+          "custom-vector-tiles: version": "1.x"
+        },
+        "id": "custom-vector-tiles",
+        "sources": {
+          "custom": {
+            "type": "vector",
+            "url": "http://localhost:3030/custom.json"
+          }
+        },
+        "layers": [
+          layerStyles['state-house'] // default style
+        ]
+      };
+
       var map = new mapboxgl.Map({
         container: 'map', // container id
-        style: 'http://localhost:3030/default/style.json', // style URL
-        center: [-74.5, 40], // starting position [lng, lat]
-        zoom: 7 // starting zoom
+        style,
+        center: [-86.83513894572297, 39.48751422496014], // starting position [lng, lat]
+        zoom: 3.5 // starting zoom
       });
+
+      // toggle layers from legend clicks
+      $('.layer').click((e) => {
+        $(e.target).toggleClass('disabled');
+
+        const newLayers = [];
+        $.each($('.layer'), (_, el) => {
+          const $el = $(el);
+          if (!$el.hasClass('disabled')) {
+            const layer = $el.data('layer');
+            newLayers.push(layerStyles[layer]);
+          }
+        });
+
+        style.layers = newLayers;
+        map.setStyle(style);
+      });
+
+
+      // update debug on map movements
+      var debug = $('#debug');
+      function updateDebug() {
+        debug.html('Zoom: ' + map.getZoom());
+      }
+      map.on('zoom', updateDebug);
     </script>
 
   </body>

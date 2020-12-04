@@ -1,8 +1,9 @@
 #!/bin/bash
 
-set -ex
+# same as genrate_tiles, but creates a separate .mbtiles file
+# for each constitnuency type, instead of separating by layers
 
-# required dependencies: wget bunzip2 sqlite3 node tippecanoe
+set -ex
 
 # Download constituency shapes from whos-on-first
 if [ ! -f ./data/whosonfirst-data-constituency-us-latest.db ]; then
@@ -16,16 +17,17 @@ echo "Extracting whosonfirst us-constituency data"
 sqlite3 ./data/whosonfirst-data-constituency-us-latest.db "select body from geojson" > ./data/constituencies.geojson
 
 # Update geojson records with layer info
-echo "Adding layer info to json"
-node generate_layers.js
+echo "Split into files for each constituent type"
+node split_files.js
 
 # Generate mbtiles
-# -z 10 (maxzoom 10)
-# -Z 0 (minzoom 0)
-# -r1 (dont drop points)
+# -zg (zoom guess: optimized for best zoom levels to render)
+# -pS (only simplify polygons at low zoom levels)
 # -P (parallel process input file)
-# -pf (no feature limit)
-# -pk (no point limit)
 # -f (force: allow override of existing file)
 # -o (output file)
-tippecanoe -z 10 -Z 0 -r1 -P -pf -pk -f -o "./tiles/us-constituencies.mbtiles" "data/constituencies-with-layers.geojson"
+for file in data/constituencies-*; do
+  base=$(basename "$file" | sed 's/\.[^.]*$//')
+  tippecanoe -zg -pS -P -f -o "./tiles/$base.mbtiles" "$file"
+done
+
