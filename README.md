@@ -30,3 +30,8 @@ node server.js
 ```
 
 Going to `http://localhost:3030` should serve the `index.html` file, that will use render the tileset using [Mapbox GL JS](https://github.com/mapbox/mapbox-gl-js)
+
+## Attribution
+Thanks to [Geocode Earth](https://geocode.earth/) for graciously building and hosing the whosonfirst data
+
+Most of the server-related code was inspired by [Tileserver GL](https://github.com/maptiler/tileserver-gl)
