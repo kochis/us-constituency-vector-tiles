@@ -1,4 +1,4 @@
-# US Constistuency Vector Tiles
+# US Constituency Vector Tiles
 
 This repo contains scripts for generating vector tiles of all US constituencies, based on data from [Who's On First](https://www.whosonfirst.org/). 
 
