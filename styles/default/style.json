@@ -1,0 +1,26 @@
+{
+  "version": 8,
+  "name": "Custom Vector Tiles",
+  "metadata": {
+    "custom-vector-tiles: version": "1.x"
+  },
+  "sources": {
+    "custom": {
+      "type": "vector",
+      "url": "http://localhost:3030/custom.json"
+    }
+  },
+  "layers": [
+    {
+      "id": "state-house-fill",
+      "source": "custom",
+      "source-layer": "state-house",
+      "type": "fill",
+      "paint": {
+        "fill-color": "#00bbff",
+        "fill-opacity": 0.4
+      }
+    }
+  ],
+  "id": "custom-vector-tiles"
+}
