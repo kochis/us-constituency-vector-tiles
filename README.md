@@ -29,7 +29,7 @@ Once the MBTiles have been generated, you can start the node server to server:
 node server.js
 ```
 
-Going to `http://localhost:3030` should serve the `index.html` file, that will render the tileset using [Mapbox GL JS](https://github.com/mapbox/mapbox-gl-js)
+Going to `http://localhost:3030` should serve the `index.html` file, that will render the tileset using [Mapbox GL](https://github.com/mapbox/mapbox-gl-js)
 
 ![image](https://user-images.githubusercontent.com/814934/101223635-76061a00-365a-11eb-9842-63ae7daa98af.png)
 

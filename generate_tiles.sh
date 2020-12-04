@@ -4,6 +4,8 @@ set -ex
 
 # required dependencies: wget bunzip2 sqlite3 node tippecanoe
 
+mkdir ./data ./tiles
+
 # Download constituency shapes from whos-on-first
 if [ ! -f ./data/whosonfirst-data-constituency-us-latest.db ]; then
   echo "Downloading data"
