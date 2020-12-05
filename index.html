@@ -178,6 +178,29 @@
         debug.html('Zoom: ' + map.getZoom());
       }
       map.on('zoom', updateDebug);
+
+      // Create a popup, but don't add it to the map yet.
+      var popup = new mapboxgl.Popup({
+        closeButton: false,
+        closeOnClick: false
+      });
+      map.on('mousemove', function(e) {
+        var features = map.queryRenderedFeatures(e.point);
+        var showPopup = false;
+        if (features.length > 0) {
+          var feature = features[0];
+          var name = feature.properties['wof:name'];
+          if (name) {
+            map.getCanvas().style.cursor = 'pointer'
+            popup.setLngLat(e.lngLat).setHTML(name).addTo(map);
+            showPopup = true;
+          }
+        }
+        if (!showPopup) {
+          map.getCanvas().style.cursor = '';
+          popup.remove();
+        }
+      });
     </script>
 
   </body>
