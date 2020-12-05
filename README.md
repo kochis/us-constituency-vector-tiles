@@ -16,14 +16,18 @@ There are also some node dependencies, so dont for get to
 npm install
 ```
 
-## Generate MBTiles
+## Usage
+
+### Generate MBTiles
 The script `generate_tiles.sh` will take care of downloading and processing the data into an `.mbtiles` file. The general steps are
 * Download whosonfirst constituency data
 * Extract the GeoJSON using `sqlite3`
 * Post-process the data with `./generate_layers.js` to add tippecanoe metadata
 * Run `tippecanoe` on the GeoJSON to output an `.mbtiles` file
 
-## Serve vector tiles
+Once done, the generated `.mbtiles` file will be in the `./tiles` folder. You can find the additional downloaded and processed files in `./data`.
+
+### Serve vector tiles
 Once the MBTiles have been generated, you can start the node server to server:
 ```
 node server.js

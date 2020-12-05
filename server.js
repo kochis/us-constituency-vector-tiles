@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 const environment = process.env.NODE_ENV;
 const port = process.env.PORT || 3030;
 const isDev = environment === 'development';
@@ -9,6 +11,7 @@ const zlib = require('zlib');
 
 const clone = require('clone');
 const express = require('express');
+const morgan = require('morgan');
 const Pbf = require('pbf');
 const MBTiles = require('@mapbox/mbtiles');
 const VectorTile = require('@mapbox/vector-tile').VectorTile;
@@ -57,6 +60,8 @@ const startServer = async () => {
   await loadTiles(); // wait for tiles to laod
 
   const app = express();
+
+  app.use(morgan('tiny'));
 
   // serve style for map
   app.get('/:theme/style.json', (req, res, next) => {
@@ -156,6 +161,17 @@ const startServer = async () => {
 
   app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
+  });
+
+  app.get('/basemap', (req, res) => {
+    fs.readFile('./basemap.html', (err, file) => {
+      if (err) {
+        console.error(err);
+        return res.status(500);
+      }
+      res.header("Content-Type",'text/html');
+      res.send(file.toString().replace('MAPBOX_ACCESS_TOKEN', process.env.MAPBOX_ACCESS_TOKEN));
+    });
   });
 
   app.listen(port, () => {

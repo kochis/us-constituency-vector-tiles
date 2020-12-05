@@ -129,37 +129,39 @@
         }
       };
 
-      var style = {
-        "version": 8,
-        "name": "Custom Vector Tiles",
-        "metadata": {
-          "custom-vector-tiles: version": "1.x"
-        },
-        "id": "us-constituencies",
-        "sources": {
-          "us-constituencies": {
-            "type": "vector",
-            "url": "http://localhost:3030/us-constituencies.json"
-          }
-        },
-        "layers": [
-          layerStyles['state-house'] // default style
-        ]
-      };
+      mapboxgl.accessToken = 'MAPBOX_ACCESS_TOKEN';
 
       var map = new mapboxgl.Map({
         container: 'map', // container id
-        style,
+        style: 'mapbox://styles/mapbox/light-v10',
         center: [-97.04129450036908, 38.08064523709163], // starting position [lng, lat]
         zoom: 3.5 // starting zoom
       });
 
+      map.on('load', function() {
+        map.addSource('us-constituencies', {
+          type: 'vector',
+          url: 'http://localhost:3030/us-constituencies.json'
+        });
+        map.addLayer(layerStyles['state-house']);
+      });
+
       // toggle layers from legend clicks
-      $('.layer').click((e) => {
+      $('.layer').click(function(e) {
         $(e.target).toggleClass('disabled');
 
         const newLayers = [];
-        $.each($('.layer'), (_, el) => {
+
+        // filter out existing constituencies
+        const ids = Object.keys(layerStyles).map(id => `${id}-fill`);
+        map.getStyle().layers.forEach((layer) => {
+          if (!ids.includes(layer.id)) {
+            newLayers.push(layer);
+          }
+        });
+
+        // add selected constituencies
+        $.each($('.layer'), function(_, el) {
           const $el = $(el);
           if (!$el.hasClass('disabled')) {
             const layer = $el.data('layer');
@@ -167,10 +169,10 @@
           }
         });
 
-        style.layers = newLayers;
-        map.setStyle(style);
+        const newStyle = map.getStyle();
+        newStyle.layers = newLayers;
+        map.setStyle(newStyle);
       });
-
 
       // update debug on map movements
       var debug = $('#debug');
